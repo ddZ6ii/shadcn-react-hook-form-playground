@@ -4,7 +4,7 @@ import React from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RegisterForm } from '@/components'
-import { setupFormSubmission } from '@/__tests__/setup-submission'
+import { setupFormSubmission } from '@/tests/utils/setup-submission'
 
 type FormData = Parameters<
   NonNullable<React.ComponentProps<typeof RegisterForm>['onSubmit']>
@@ -22,8 +22,6 @@ const invalidFormData: FormData = {
 }
 
 describe('RegisterForm', () => {
-  let user: ReturnType<typeof userEvent.setup>
-
   function getFormElements() {
     return {
       nameInput: screen.getByLabelText(/name/i),
@@ -35,6 +33,8 @@ describe('RegisterForm', () => {
 
   // Non-submission related tests
   describe('form display and validation', () => {
+    let user: ReturnType<typeof userEvent.setup>
+
     beforeEach(() => {
       user = userEvent.setup()
       render(<RegisterForm />)
@@ -112,6 +112,16 @@ describe('RegisterForm', () => {
     // Registers beforeEach/afterEach hooks and returns a ctx object mutated before each test.
     const ctx = setupFormSubmission<FormData>(RegisterForm)
 
+    async function submitValidForm(u: ReturnType<typeof userEvent.setup>) {
+      const { nameInput, emailInput, ageInput, submitButton } =
+        getFormElements()
+
+      await u.type(nameInput, validFormData.name)
+      await u.type(emailInput, validFormData.email)
+      await u.type(ageInput, validFormData.age.toString())
+      await u.click(submitButton)
+    }
+
     async function getSuccessScreenElements() {
       const [heading, registerAnotherUserButton] = await Promise.all([
         screen.findByRole('heading', {
@@ -123,16 +133,6 @@ describe('RegisterForm', () => {
       ])
 
       return { heading, registerAnotherUserButton }
-    }
-
-    async function submitValidForm() {
-      const { nameInput, emailInput, ageInput, submitButton } =
-        getFormElements()
-
-      await user.type(nameInput, validFormData.name)
-      await user.type(emailInput, validFormData.email)
-      await user.type(ageInput, validFormData.age.toString())
-      await user.click(submitButton)
     }
 
     it('shows spinner and disables fieldset while submitting', async () => {
@@ -156,13 +156,13 @@ describe('RegisterForm', () => {
     })
 
     it('calls onSubmit with correct form data', async () => {
-      await submitValidForm()
+      await submitValidForm(ctx.user)
       vi.advanceTimersByTime(ctx.ms)
       expect(ctx.mockOnSubmit).toHaveBeenCalledWith(validFormData)
     })
 
     it('shows success screen after valid form submission', async () => {
-      await submitValidForm()
+      await submitValidForm(ctx.user)
       vi.advanceTimersByTime(ctx.ms)
 
       const { heading, registerAnotherUserButton } =
@@ -173,11 +173,11 @@ describe('RegisterForm', () => {
     })
 
     it('returns to form when Register another user is clicked', async () => {
-      await submitValidForm()
+      await submitValidForm(ctx.user)
       vi.advanceTimersByTime(ctx.ms)
 
       const { registerAnotherUserButton } = await getSuccessScreenElements()
-      await user.click(registerAnotherUserButton)
+      await ctx.user.click(registerAnotherUserButton)
 
       const { nameInput, emailInput, ageInput, submitButton } =
         getFormElements()

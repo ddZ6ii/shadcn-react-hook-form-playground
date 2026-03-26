@@ -4,7 +4,7 @@ import React from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { BugReportForm } from '@/components'
-import { setupFormSubmission } from '@/__tests__/setup-submission'
+import { setupFormSubmission } from '@/tests/utils/setup-submission'
 
 type FormData = Parameters<
   NonNullable<React.ComponentProps<typeof BugReportForm>['onSubmit']>
@@ -18,8 +18,6 @@ const validFormData: FormData = {
 const invalidFormData: FormData = { title: 'ab', description: 'Too short' }
 
 describe('BugReportForm', () => {
-  let user: ReturnType<typeof userEvent.setup>
-
   function getFormElements() {
     return {
       titleInput: screen.getByLabelText(/bug title/i),
@@ -31,6 +29,8 @@ describe('BugReportForm', () => {
 
   // Non-submission related tests
   describe('form display and validation', () => {
+    let user: ReturnType<typeof userEvent.setup>
+
     beforeEach(() => {
       user = userEvent.setup()
       render(<BugReportForm />)
@@ -119,12 +119,12 @@ describe('BugReportForm', () => {
     // Registers beforeEach/afterEach hooks and returns a ctx object mutated before each test.
     const ctx = setupFormSubmission<FormData>(BugReportForm)
 
-    async function submitValidForm() {
+    async function submitValidForm(u: ReturnType<typeof userEvent.setup>) {
       const { titleInput, descriptionInput, submitButton } = getFormElements()
 
-      await user.type(titleInput, validFormData.title)
-      await user.type(descriptionInput, validFormData.description)
-      await user.click(submitButton)
+      await u.type(titleInput, validFormData.title)
+      await u.type(descriptionInput, validFormData.description)
+      await u.click(submitButton)
     }
 
     async function getSuccessScreenElements() {
@@ -158,13 +158,13 @@ describe('BugReportForm', () => {
     })
 
     it('calls onSubmit with correct form data', async () => {
-      await submitValidForm()
+      await submitValidForm(ctx.user)
       vi.advanceTimersByTime(ctx.ms)
       expect(ctx.mockOnSubmit).toHaveBeenCalledWith(validFormData)
     })
 
     it('shows success screen after valid form submission', async () => {
-      await submitValidForm()
+      await submitValidForm(ctx.user)
       vi.advanceTimersByTime(ctx.ms)
 
       const { heading, reportAnotherButton } = await getSuccessScreenElements()
@@ -173,11 +173,11 @@ describe('BugReportForm', () => {
     })
 
     it('returns to form when Report Another Bug is clicked', async () => {
-      await submitValidForm()
+      await submitValidForm(ctx.user)
       vi.advanceTimersByTime(ctx.ms)
 
       const { reportAnotherButton } = await getSuccessScreenElements()
-      await user.click(reportAnotherButton)
+      await ctx.user.click(reportAnotherButton)
 
       const { titleInput, descriptionInput } = getFormElements()
       expect(titleInput).toBeInTheDocument()
