@@ -1,133 +1,190 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect, beforeEach } from 'vitest'
+import React from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RegisterForm } from '@/components'
-import { delay } from '@/utilities'
+import { setupFormSubmission } from '@/__tests__/setup-submission'
+
+type FormData = Parameters<
+  NonNullable<React.ComponentProps<typeof RegisterForm>['onSubmit']>
+>[0]
+
+const validFormData: FormData = {
+  name: 'Valid name',
+  email: 'valid@example.com',
+  age: 25,
+}
+const invalidFormData: FormData = {
+  name: 'ab',
+  email: 'invalid-email',
+  age: 17,
+}
 
 describe('RegisterForm', () => {
   let user: ReturnType<typeof userEvent.setup>
 
-  describe('validation', () => {
+  function getFormElements() {
+    return {
+      nameInput: screen.getByLabelText(/name/i),
+      emailInput: screen.getByLabelText(/email/i),
+      ageInput: screen.getByLabelText(/age/i),
+      submitButton: screen.getByRole('button', { name: /submit/i }),
+    }
+  }
+
+  // Non-submission related tests
+  describe('form display and validation', () => {
     beforeEach(() => {
       user = userEvent.setup()
       render(<RegisterForm />)
     })
 
     it('renders form with name field, email field, age field, and submit button', () => {
-      expect(screen.getByLabelText('Name')).toBeInTheDocument()
-      expect(screen.getByLabelText('Email')).toBeInTheDocument()
-      expect(screen.getByLabelText('Age')).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument()
+      const { nameInput, emailInput, ageInput, submitButton } =
+        getFormElements()
+
+      expect(nameInput).toBeInTheDocument()
+      expect(emailInput).toBeInTheDocument()
+      expect(ageInput).toBeInTheDocument()
+      expect(submitButton).toBeInTheDocument()
     })
 
     it('shows error when name is shorter than 5 characters', async () => {
-      await user.type(screen.getByLabelText('Name'), 'ab')
+      const { nameInput } = getFormElements()
+
+      await user.type(nameInput, invalidFormData.name)
       await user.tab()
 
       expect(
-        await screen.findByText('Name must be at least 5 characters long.'),
+        await screen.findByText(/name must be at least 5 characters long./i),
       ).toBeInTheDocument()
     })
 
     it('shows error when name exceeds 100 characters', async () => {
-      await user.type(screen.getByLabelText('Name'), 'a'.repeat(101))
+      const { nameInput } = getFormElements()
+
+      await user.click(nameInput)
+      await user.paste('a'.repeat(101)) // much faster than user.type() since it fires a single event instead of multiple keyboard cycles
       await user.tab()
 
       expect(
-        await screen.findByText('Name must be at most 100 characters long.'),
+        await screen.findByText(/name must be at most 100 characters long./i),
       ).toBeInTheDocument()
     })
 
     it('shows error when email is not valid', async () => {
-      await user.type(screen.getByLabelText('Email'), 'invalid-email')
+      const { emailInput } = getFormElements()
+
+      await user.type(emailInput, invalidFormData.email)
       await user.tab()
 
       expect(
-        await screen.findByText('Please enter a valid email address.'),
+        await screen.findByText(/please enter a valid email address./i),
       ).toBeInTheDocument()
     })
 
     it('shows error when age is less than 18', async () => {
-      await user.type(screen.getByLabelText('Age'), '17')
+      const { ageInput } = getFormElements()
+
+      await user.type(ageInput, invalidFormData.age.toString())
       await user.tab()
 
       expect(
-        await screen.findByText('You must be at least 18 years old.'),
+        await screen.findByText(/you must be at least 18 years old./i),
       ).toBeInTheDocument()
     })
 
     it('shows error when age is greater than 120', async () => {
-      await user.type(screen.getByLabelText('Age'), '121')
+      const { ageInput } = getFormElements()
+
+      await user.type(ageInput, '121')
       await user.tab()
 
       expect(
-        await screen.findByText('Please enter a valid age.'),
+        await screen.findByText(/please enter a valid age./i),
       ).toBeInTheDocument()
     })
   })
 
+  // Submission related tests (need fake timers + onSubmit)
   describe('form submission', () => {
-    async function submitValidForm() {
-      await user.type(screen.getByLabelText('Name'), 'Valid name')
-      await user.type(screen.getByLabelText('Email'), 'valid@example.com')
-      await user.type(screen.getByLabelText('Age'), '25')
-      await user.click(screen.getByRole('button', { name: 'Submit' }))
+    // Registers beforeEach/afterEach hooks and returns a ctx object mutated before each test.
+    const ctx = setupFormSubmission<FormData>(RegisterForm)
+
+    async function getSuccessScreenElements() {
+      const [heading, registerAnotherUserButton] = await Promise.all([
+        screen.findByRole('heading', {
+          name: /thanks for registering!/i,
+        }),
+        screen.findByRole('button', {
+          name: /register another user/i,
+        }),
+      ])
+
+      return { heading, registerAnotherUserButton }
     }
 
-    beforeEach(() => {
-      user = userEvent.setup()
-      render(
-        <RegisterForm
-          onSubmit={async () => {
-            await delay(2000)
-          }}
-        />,
-      )
-    })
+    async function submitValidForm() {
+      const { nameInput, emailInput, ageInput, submitButton } =
+        getFormElements()
+
+      await user.type(nameInput, validFormData.name)
+      await user.type(emailInput, validFormData.email)
+      await user.type(ageInput, validFormData.age.toString())
+      await user.click(submitButton)
+    }
 
     it('shows spinner and disables fieldset while submitting', async () => {
-      await user.type(screen.getByLabelText('Name'), 'Valid name')
-      await user.type(screen.getByLabelText('Email'), 'valid@example.com')
-      await user.type(screen.getByLabelText('Age'), '25')
+      const { nameInput, emailInput, ageInput, submitButton } =
+        getFormElements()
 
-      void user.click(screen.getByRole('button', { name: 'Submit' }))
+      await ctx.user.type(nameInput, validFormData.name)
+      await ctx.user.type(emailInput, validFormData.email)
+      await ctx.user.type(ageInput, validFormData.age.toString())
 
-      expect(await screen.findByText('Submitting...')).toBeInTheDocument()
-      expect(
-        screen.getByText('Submitting...').closest('fieldset'),
-      ).toBeDisabled()
+      // Starts submission without awaiting to observe the loading state (fire-and-forget).
+      // submitValidForm() cannot be used since it awaits the click, which waits for the whole submission to complete before returning.
+      void ctx.user.click(submitButton)
+
+      const submittingButton = await screen.findByRole('button', {
+        name: /submitting\.\.\./i,
+      })
+
+      expect(submittingButton).toBeInTheDocument()
+      expect(submittingButton.closest('fieldset')).toBeDisabled()
+    })
+
+    it('calls onSubmit with correct form data', async () => {
+      await submitValidForm()
+      vi.advanceTimersByTime(ctx.ms)
+      expect(ctx.mockOnSubmit).toHaveBeenCalledWith(validFormData)
     })
 
     it('shows success screen after valid form submission', async () => {
       await submitValidForm()
+      vi.advanceTimersByTime(ctx.ms)
 
-      expect(
-        await screen.findByRole(
-          'heading',
-          { name: /thanks for registering!/i },
-          { timeout: 3000 },
-        ),
-      ).toBeInTheDocument()
-      expect(
-        screen.getByRole('button', { name: /register another user/i }),
-      ).toBeInTheDocument()
+      const { heading, registerAnotherUserButton } =
+        await getSuccessScreenElements()
+
+      expect(heading).toBeInTheDocument()
+      expect(registerAnotherUserButton).toBeInTheDocument()
     })
 
     it('returns to form when Register another user is clicked', async () => {
       await submitValidForm()
+      vi.advanceTimersByTime(ctx.ms)
 
-      const buttonEl = await screen.findByRole(
-        'button',
-        { name: /register another user/i },
-        { timeout: 3000 },
-      )
-      await user.click(buttonEl)
+      const { registerAnotherUserButton } = await getSuccessScreenElements()
+      await user.click(registerAnotherUserButton)
 
-      expect(screen.getByLabelText('Name')).toBeInTheDocument()
-      expect(screen.getByLabelText('Email')).toBeInTheDocument()
-      expect(screen.getByLabelText('Age')).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument()
+      const { nameInput, emailInput, ageInput, submitButton } =
+        getFormElements()
+      expect(nameInput).toBeInTheDocument()
+      expect(emailInput).toBeInTheDocument()
+      expect(ageInput).toBeInTheDocument()
+      expect(submitButton).toBeInTheDocument()
     })
   })
 })
