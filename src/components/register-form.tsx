@@ -52,16 +52,19 @@ const initialFormData: FormInput = {
   age: undefined,
 }
 
-function RegisterForm() {
+interface RegisterFormProps {
+  onSubmit?: (data: FormOutput) => Promise<void>
+}
+
+function RegisterForm({ onSubmit }: RegisterFormProps) {
   const form = useForm<FormInput, unknown, FormOutput>({
     resolver: zodResolver(schema) as Resolver<FormInput, unknown, FormOutput>,
     defaultValues: initialFormData,
     mode: 'onTouched',
   })
 
-  const onSubmit: SubmitHandler<FormOutput> = async (data) => {
-    console.log('Registration form submitted with:', data)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+  const submit: SubmitHandler<FormOutput> = async (data) => {
+    await onSubmit?.(data)
     form.reset()
   }
 
@@ -92,7 +95,7 @@ function RegisterForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
+        <form noValidate onSubmit={form.handleSubmit(submit)}>
           <FieldSet disabled={form.formState.isSubmitting}>
             <FieldGroup>
               <Controller

@@ -47,7 +47,11 @@ const initialFormData: FormData = {
   description: '',
 }
 
-function BugReportForm() {
+interface BugReportFormProps {
+  onSubmit?: (data: FormData) => Promise<void>
+}
+
+function BugReportForm({ onSubmit }: BugReportFormProps) {
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: initialFormData,
@@ -55,8 +59,7 @@ function BugReportForm() {
   })
 
   const submit: SubmitHandler<FormData> = async (data) => {
-    console.log('Bug report submitted with:', data)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await onSubmit?.(data)
     form.reset()
   }
 
