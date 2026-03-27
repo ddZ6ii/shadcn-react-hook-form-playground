@@ -1,4 +1,4 @@
-type TabName = 'bug' | 'register'
+type TabName = 'bug' | 'register' | 'expense-tracker'
 
 type Tab = {
   value: TabName

@@ -1,4 +1,4 @@
-import { BugReportForm, RegisterForm } from '@/components'
+import { BugReportForm, ExpenseTrackerForm, RegisterForm } from '@/components'
 import type { Tab } from '@/types'
 import { delay } from '@/utilities'
 
@@ -12,6 +12,11 @@ const onRegisterSubmit = async (data: unknown): Promise<void> => {
   await delay()
 }
 
+const onExpenseTrackerSubmit = async (data: unknown): Promise<void> => {
+  console.log('Expense tracker form submitted with:', data)
+  await delay()
+}
+
 const TABS: Tab[] = [
   {
     value: 'bug',
@@ -22,6 +27,13 @@ const TABS: Tab[] = [
     value: 'register',
     title: 'Register',
     renderContent: () => <RegisterForm onSubmit={onRegisterSubmit} />,
+  },
+  {
+    value: 'expense-tracker',
+    title: 'Expense Tracker',
+    renderContent: () => (
+      <ExpenseTrackerForm onSubmit={onExpenseTrackerSubmit} />
+    ),
   },
 ]
 

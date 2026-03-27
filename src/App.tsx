@@ -15,7 +15,7 @@ function App() {
     <ThemeContextProvider>
       <PageLayout>
         <Tabs value={selectedTab} className="gap-4">
-          <TabsList>
+          <TabsList className="mx-auto">
             {TABS.map((tab) => (
               <TabsTrigger
                 key={tab.value}

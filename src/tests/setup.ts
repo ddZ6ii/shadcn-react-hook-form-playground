@@ -17,6 +17,13 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
+// jsdom doesn't implement scrollIntoView nor the Pointer Capture API
+// must be mocked it so Radix UI components don't throw
+Element.prototype.scrollIntoView = vi.fn()
+Element.prototype.hasPointerCapture = vi.fn()
+Element.prototype.setPointerCapture = vi.fn()
+Element.prototype.releasePointerCapture = vi.fn()
+
 // runs a clean after each test case (e.g. clearing jsdom)
 afterEach(() => {
   cleanup()
