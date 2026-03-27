@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
 import { categories, type Category } from '@/types'
 
@@ -129,7 +130,9 @@ function ExpenseTrackerForm({ onSubmit }: ExpenseTrackerFormProps) {
                       aria-describedby="description-error"
                     />
                     {fieldState.error && (
-                      <FieldError id="description-error">{fieldState.error.message}</FieldError>
+                      <FieldError id="description-error">
+                        {fieldState.error.message}
+                      </FieldError>
                     )}
                   </Field>
                 )}
@@ -152,7 +155,9 @@ function ExpenseTrackerForm({ onSubmit }: ExpenseTrackerFormProps) {
                       aria-describedby="amount-error"
                     />
                     {fieldState.error && (
-                      <FieldError id="amount-error">{fieldState.error.message}</FieldError>
+                      <FieldError id="amount-error">
+                        {fieldState.error.message}
+                      </FieldError>
                     )}
                   </Field>
                 )}
@@ -191,7 +196,9 @@ function ExpenseTrackerForm({ onSubmit }: ExpenseTrackerFormProps) {
                       </SelectContent>
                     </Select>
                     {fieldState.error && (
-                      <FieldError id="category-error">{fieldState.error.message}</FieldError>
+                      <FieldError id="category-error">
+                        {fieldState.error.message}
+                      </FieldError>
                     )}
                   </Field>
                 )}
@@ -215,4 +222,55 @@ function ExpenseTrackerForm({ onSubmit }: ExpenseTrackerFormProps) {
   )
 }
 
+function ExpenseTrackerSkeleton() {
+  return (
+    <Card className="mx-auto w-full max-w-sm">
+      <CardHeader>
+        <Skeleton id="card-title" className="h-5 w-full sm:w-3/12" />
+        <div className="space-y-2 min-[345px]:space-y-1">
+          <Skeleton
+            id="card-description"
+            className="h-3 w-full min-[345px]:h-3.5 sm:w-4/5"
+          />
+          <Skeleton
+            id="card-description"
+            className="h-3 w-full min-[345px]:h-3 sm:w-2/5"
+          />
+          <Skeleton
+            id="card-description"
+            className="h-3 w-1/5 min-[345px]:hidden"
+          />
+        </div>
+      </CardHeader>
+      <CardContent>
+        <FieldSet>
+          <FieldGroup>
+            <Field>
+              <Skeleton id="name-label" className="h-5 w-1/5!" />
+              <Skeleton id="name-input" className="h-9 w-full" />
+            </Field>
+
+            <Field>
+              <Skeleton id="email-label" className="h-5 w-1/5!" />
+              <Skeleton id="email-input" className="h-9 w-full" />
+            </Field>
+
+            <Field>
+              <Skeleton id="age-label" className="h-5 w-1/5!" />
+              <Skeleton id="age-input" className="h-9 w-full" />
+            </Field>
+          </FieldGroup>
+
+          <FieldGroup>
+            <Field orientation="responsive">
+              <Skeleton id="submit-button" className="h-9 min-w-24" />
+            </Field>
+          </FieldGroup>
+        </FieldSet>
+      </CardContent>
+    </Card>
+  )
+}
+
 export default ExpenseTrackerForm
+export { ExpenseTrackerSkeleton }

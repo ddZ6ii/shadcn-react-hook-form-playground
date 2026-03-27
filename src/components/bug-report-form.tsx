@@ -25,6 +25,7 @@ import {
   InputGroupAddon,
   InputGroupTextarea,
 } from '@/components/ui/input-group'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
 
 const schema = z
@@ -111,7 +112,10 @@ function BugReportForm({ onSubmit }: BugReportFormProps) {
                       aria-describedby="title-error"
                     />
                     {fieldState.invalid && (
-                      <FieldError id="title-error" errors={[fieldState.error]} />
+                      <FieldError
+                        id="title-error"
+                        errors={[fieldState.error]}
+                      />
                     )}
                   </Field>
                 )}
@@ -149,7 +153,10 @@ function BugReportForm({ onSubmit }: BugReportFormProps) {
                       actually happened.
                     </FieldDescription>
                     {fieldState.invalid && (
-                      <FieldError id="description-error" errors={[fieldState.error]} />
+                      <FieldError
+                        id="description-error"
+                        errors={[fieldState.error]}
+                      />
                     )}
                   </Field>
                 )}
@@ -191,4 +198,55 @@ function BugReportForm({ onSubmit }: BugReportFormProps) {
   )
 }
 
+function BugReportFormSkeleton() {
+  return (
+    <Card className="mx-auto w-full max-w-lg">
+      <CardHeader>
+        <Skeleton id="card-title" className="h-5 w-full sm:w-3/12" />
+        <div className="space-y-2.5 min-[400px]:space-y-2.5">
+          <Skeleton
+            id="card-description"
+            className="h-3.5 w-full min-[400px]:h-3 sm:w-4/6"
+          />
+          <Skeleton
+            id="card-description"
+            className="h-3.5 w-1/5 min-[400px]:hidden"
+          />
+        </div>
+      </CardHeader>
+      <CardContent>
+        <FieldSet>
+          <FieldGroup>
+            <Field>
+              <Skeleton id="title-label" className="h-5 w-1/5!" />
+              <Skeleton id="title-input" className="h-9 w-full" />
+            </Field>
+            <Field>
+              <Skeleton id="description-label" className="h-5 w-1/5!" />
+              <Skeleton id="description-input" className="h-42 w-full" />
+              <div className="space-y-2.5 min-[400px]:space-y-2.5">
+                <Skeleton
+                  id="description-1"
+                  className="h-3.5 w-full min-[400px]:h-3"
+                />
+                <Skeleton
+                  id="description-2"
+                  className="h-3.5 w-full min-[400px]:h-3 sm:w-1/5"
+                />
+              </div>
+            </Field>
+          </FieldGroup>
+          <FieldGroup>
+            <Field orientation="responsive">
+              <Skeleton id="reset-button" className="h-9 min-w-24" />
+              <Skeleton id="submit-button" className="h-9 min-w-24" />
+            </Field>
+          </FieldGroup>
+        </FieldSet>
+      </CardContent>
+    </Card>
+  )
+}
+
 export default BugReportForm
+export { BugReportFormSkeleton }

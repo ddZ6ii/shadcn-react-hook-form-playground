@@ -11,7 +11,11 @@ export default function Navbar({
   const { darkMode, toggleDarkMode } = useThemeContext()
 
   return (
-    <nav aria-label="Main navigation" className={cn('flex justify-between gap-4', className)} {...props}>
+    <nav
+      aria-label="Main navigation"
+      className={cn('flex justify-between gap-4', className)}
+      {...props}
+    >
       <Heading as="h1">Shadcn + React Hook Form Playground</Heading>
       <Button
         size="icon-sm"

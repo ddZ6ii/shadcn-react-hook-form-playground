@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/field'
 import { Heading } from '@/components/ui/heading'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
 
 const schema = z.object({
@@ -179,20 +180,22 @@ function RegisterForm({ onSubmit }: RegisterFormProps) {
             </FieldGroup>
 
             <FieldGroup>
-              <Button
-                type="submit"
-                className="w-fit min-w-24"
-                disabled={!form.formState.isValid}
-              >
-                {form.formState.isSubmitting ? (
-                  <>
-                    <Spinner aria-hidden="true" />
-                    <span>Submitting...</span>
-                  </>
-                ) : (
-                  'Submit'
-                )}
-              </Button>
+              <Field orientation="responsive">
+                <Button
+                  type="submit"
+                  className="w-fit min-w-24"
+                  disabled={!form.formState.isValid}
+                >
+                  {form.formState.isSubmitting ? (
+                    <>
+                      <Spinner aria-hidden="true" />
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    'Submit'
+                  )}
+                </Button>
+              </Field>
             </FieldGroup>
           </FieldSet>
         </form>
@@ -201,4 +204,51 @@ function RegisterForm({ onSubmit }: RegisterFormProps) {
   )
 }
 
+function RegisterFormSkeleton() {
+  return (
+    <Card className="mx-auto w-full max-w-lg">
+      <CardHeader>
+        <Skeleton id="card-title" className="h-5 w-full sm:w-3/12" />
+        <div className="space-y-2 min-[480px]:space-y-0">
+          <Skeleton
+            id="card-description"
+            className="h-3 w-full min-[480px]:h-3.5 sm:w-4/5"
+          />
+          <Skeleton
+            id="card-description"
+            className="h-3.5 w-1/5 min-[480px]:hidden"
+          />
+        </div>
+      </CardHeader>
+      <CardContent>
+        <FieldSet>
+          <FieldGroup>
+            <Field>
+              <Skeleton id="name-label" className="h-5 w-1/5!" />
+              <Skeleton id="name-input" className="h-9 w-full" />
+            </Field>
+
+            <Field>
+              <Skeleton id="email-label" className="h-5 w-1/5!" />
+              <Skeleton id="email-input" className="h-9 w-full" />
+            </Field>
+
+            <Field>
+              <Skeleton id="age-label" className="h-5 w-1/5!" />
+              <Skeleton id="age-input" className="h-9 w-full" />
+            </Field>
+          </FieldGroup>
+
+          <FieldGroup>
+            <Field orientation="responsive">
+              <Skeleton id="submit-button" className="h-9 min-w-24" />
+            </Field>
+          </FieldGroup>
+        </FieldSet>
+      </CardContent>
+    </Card>
+  )
+}
+
 export default RegisterForm
+export { RegisterFormSkeleton }
