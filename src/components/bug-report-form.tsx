@@ -106,10 +106,12 @@ function BugReportForm({ onSubmit }: BugReportFormProps) {
                       className="text-sm"
                       placeholder="Login button not working on mobile..."
                       autoComplete="off"
+                      required
                       aria-invalid={fieldState.invalid}
+                      aria-describedby="title-error"
                     />
                     {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
+                      <FieldError id="title-error" errors={[fieldState.error]} />
                     )}
                   </Field>
                 )}
@@ -128,11 +130,15 @@ function BugReportForm({ onSubmit }: BugReportFormProps) {
                         placeholder="I'm having an issue with the login button on mobile..."
                         rows={6}
                         className="min-h-32 resize-none pb-8 text-sm"
+                        required
                         aria-invalid={fieldState.invalid}
+                        aria-describedby="description-count description-error"
                       />
                       <InputGroupAddon
+                        id="description-count"
                         align="block-end"
                         className="text-muted-foreground"
+                        aria-live="polite"
                       >
                         {field.value.length}/100 characters
                       </InputGroupAddon>
@@ -143,7 +149,7 @@ function BugReportForm({ onSubmit }: BugReportFormProps) {
                       actually happened.
                     </FieldDescription>
                     {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
+                      <FieldError id="description-error" errors={[fieldState.error]} />
                     )}
                   </Field>
                 )}
@@ -153,6 +159,7 @@ function BugReportForm({ onSubmit }: BugReportFormProps) {
             <FieldGroup>
               <Field orientation="responsive">
                 <Button
+                  type="button"
                   className="w-fit min-w-24"
                   variant="outline"
                   onClick={() => {
@@ -168,7 +175,7 @@ function BugReportForm({ onSubmit }: BugReportFormProps) {
                 >
                   {form.formState.isSubmitting ? (
                     <>
-                      <Spinner />
+                      <Spinner aria-hidden="true" />
                       <span>Submitting...</span>
                     </>
                   ) : (

@@ -111,10 +111,12 @@ function RegisterForm({ onSubmit }: RegisterFormProps) {
                       placeholder="Your name..."
                       autoComplete="off"
                       className="rounded-sm text-sm"
+                      required
                       aria-invalid={fieldState.invalid}
+                      aria-describedby="name-error"
                     />
                     {fieldState.error && (
-                      <FieldError className="text-xs">
+                      <FieldError id="name-error" className="text-xs">
                         {fieldState.error.message}
                       </FieldError>
                     )}
@@ -134,10 +136,12 @@ function RegisterForm({ onSubmit }: RegisterFormProps) {
                       placeholder="Your email..."
                       autoComplete="email"
                       className="rounded-sm text-sm"
+                      required
                       aria-invalid={fieldState.invalid}
+                      aria-describedby="email-error"
                     />
                     {fieldState.error && (
-                      <FieldError className="text-xs">
+                      <FieldError id="email-error" className="text-xs">
                         {fieldState.error.message}
                       </FieldError>
                     )}
@@ -160,10 +164,12 @@ function RegisterForm({ onSubmit }: RegisterFormProps) {
                       placeholder="Your age..."
                       autoComplete="off"
                       className="rounded-sm text-sm"
+                      required
                       aria-invalid={fieldState.invalid}
+                      aria-describedby="age-error"
                     />
                     {fieldState.error && (
-                      <FieldError className="text-xs">
+                      <FieldError id="age-error" className="text-xs">
                         {fieldState.error.message}
                       </FieldError>
                     )}
@@ -180,7 +186,7 @@ function RegisterForm({ onSubmit }: RegisterFormProps) {
               >
                 {form.formState.isSubmitting ? (
                   <>
-                    <Spinner />
+                    <Spinner aria-hidden="true" />
                     <span>Submitting...</span>
                   </>
                 ) : (

@@ -126,9 +126,10 @@ function ExpenseTrackerForm({ onSubmit }: ExpenseTrackerFormProps) {
                       className="text-sm"
                       required
                       aria-invalid={fieldState.invalid}
+                      aria-describedby="description-error"
                     />
                     {fieldState.error && (
-                      <FieldError>{fieldState.error.message}</FieldError>
+                      <FieldError id="description-error">{fieldState.error.message}</FieldError>
                     )}
                   </Field>
                 )}
@@ -148,9 +149,10 @@ function ExpenseTrackerForm({ onSubmit }: ExpenseTrackerFormProps) {
                       required
                       value={field.value ?? ''}
                       aria-invalid={fieldState.invalid}
+                      aria-describedby="amount-error"
                     />
                     {fieldState.error && (
-                      <FieldError>{fieldState.error.message}</FieldError>
+                      <FieldError id="amount-error">{fieldState.error.message}</FieldError>
                     )}
                   </Field>
                 )}
@@ -173,6 +175,7 @@ function ExpenseTrackerForm({ onSubmit }: ExpenseTrackerFormProps) {
                         onBlur={field.onBlur}
                         aria-invalid={fieldState.invalid}
                         aria-required
+                        aria-describedby="category-error"
                       >
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
@@ -188,7 +191,7 @@ function ExpenseTrackerForm({ onSubmit }: ExpenseTrackerFormProps) {
                       </SelectContent>
                     </Select>
                     {fieldState.error && (
-                      <FieldError>{fieldState.error.message}</FieldError>
+                      <FieldError id="category-error">{fieldState.error.message}</FieldError>
                     )}
                   </Field>
                 )}
@@ -198,7 +201,7 @@ function ExpenseTrackerForm({ onSubmit }: ExpenseTrackerFormProps) {
             <Button type="submit" disabled={!form.formState.isValid}>
               {form.formState.isSubmitting ? (
                 <>
-                  <Spinner />
+                  <Spinner aria-hidden="true" />
                   <span>Submitting...</span>
                 </>
               ) : (
