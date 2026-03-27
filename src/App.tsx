@@ -1,9 +1,14 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TABS } from '@/constants'
-import { usePreference } from '@/hooks'
-import { PageLayout } from '@/layouts'
-import { ThemeContextProvider } from '@/providers'
-import type { TabName } from '@/types'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/shared/components/ui/tabs'
+import { TABS } from '@/shared/constants'
+import { usePreference } from '@/shared/hooks'
+import { PageLayout } from '@/shared/layouts'
+import { ThemeContextProvider } from '@/shared/providers'
+import type { TabName } from '@/shared/types'
 
 function App() {
   const [selectedTab, setSelectedTab] = usePreference<TabName>(
